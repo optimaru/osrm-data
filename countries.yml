@@ -1,0 +1,17 @@
+# Countries built every night.
+#
+#   code       lowercase key used for storage paths and by readers
+#   name       display name
+#   extract    path of the extract under `source`, without `-latest.osm.pbf`
+#   algorithm  optional, overrides `algorithm` below
+#
+# Countries that need more memory than a hosted runner has belong in a separate
+# runner, see "Capacity" in the README.
+source: https://download.geofabrik.de
+# ch answers distance matrices about five times faster than mld, and a matrix is
+# what the route optimizer asks for. mld preprocesses about ten times faster.
+algorithm: ch
+countries:
+  - code: kr
+    name: South Korea
+    extract: asia/south-korea

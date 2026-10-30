@@ -1,0 +1,26 @@
+name: lint and test
+
+# The check list lives in .pre-commit-config.yaml and CI runs it as is.
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "*"
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  code-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - name: Run checks
+        run: uv run --group precommit pre-commit run --all-files
