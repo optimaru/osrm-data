@@ -49,9 +49,11 @@ with OSRM 26.10.0 and the `ch` algorithm in October 2026:
 | Thailand | 314 MiB | 2.5 GiB | 1.1 GiB | 9.4 GiB | 20 min |
 | Vietnam | 316 MiB | 3.1 GiB | 1.3 GiB | 12.0 GiB | 25 min |
 | Australia | 927 MiB | 1.9 GiB | 0.8 GiB | 8.0 GiB | 26 min |
+| Indonesia | 1660 MiB | 5.9 GiB | 2.5 GiB | 14.9 GiB | 66 min |
 
 `extract` sets the peak. It tracks the road network rather than the extract size: Vietnam needs more
 than Australia from a third of the file size. Check a new country with a test run instead of guessing.
+Indonesia is at the limit of what these runners can hold, so a larger country needs a bigger machine.
 
 ## License
 

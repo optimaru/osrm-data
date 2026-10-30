@@ -33,3 +33,6 @@ countries:
   - code: au
     name: Australia
     extract: australia-oceania/australia
+  - code: id
+    name: Indonesia
+    extract: asia/indonesia
