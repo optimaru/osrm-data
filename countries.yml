@@ -36,3 +36,6 @@ countries:
   - code: id
     name: Indonesia
     extract: asia/indonesia
+  - code: jp
+    name: Japan
+    extract: asia/japan
