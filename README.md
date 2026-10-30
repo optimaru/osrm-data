@@ -37,7 +37,21 @@ memory of each stage.
 
 ## Capacity
 
-<!-- capacity -->
+Builds run on GitHub-hosted runners with 16 GB of memory and four cores, plus 16 GB of swap. Measured
+with OSRM 26.10.0 and the `ch` algorithm in October 2026:
+
+| Country | Extract | Dataset | Archive | Peak memory | Job time |
+| --- | --- | --- | --- | --- | --- |
+| Malaysia, Singapore and Brunei | 241 MiB | 1.4 GiB | 0.6 GiB | 6.4 GiB | 10 min |
+| Taiwan | 313 MiB | 0.6 GiB | 0.3 GiB | 2.4 GiB | 13 min |
+| Philippines | 584 MiB | 1.5 GiB | 0.6 GiB | 6.2 GiB | 12 min |
+| South Korea | 277 MiB | 1.3 GiB | 0.6 GiB | 4.7 GiB | 17 min |
+| Thailand | 314 MiB | 2.5 GiB | 1.1 GiB | 9.4 GiB | 20 min |
+| Vietnam | 316 MiB | 3.1 GiB | 1.3 GiB | 12.0 GiB | 25 min |
+| Australia | 927 MiB | 1.9 GiB | 0.8 GiB | 8.0 GiB | 26 min |
+
+`extract` sets the peak. It tracks the road network rather than the extract size: Vietnam needs more
+than Australia from a third of the file size. Check a new country with a test run instead of guessing.
 
 ## License
 

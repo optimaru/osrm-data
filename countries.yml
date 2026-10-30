@@ -15,3 +15,21 @@ countries:
   - code: kr
     name: South Korea
     extract: asia/south-korea
+  - code: my
+    name: Malaysia, Singapore and Brunei
+    extract: asia/malaysia-singapore-brunei
+  - code: tw
+    name: Taiwan
+    extract: asia/taiwan
+  - code: ph
+    name: Philippines
+    extract: asia/philippines
+  - code: th
+    name: Thailand
+    extract: asia/thailand
+  - code: vn
+    name: Vietnam
+    extract: asia/vietnam
+  - code: au
+    name: Australia
+    extract: australia-oceania/australia
