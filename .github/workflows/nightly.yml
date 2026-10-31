@@ -67,7 +67,8 @@ jobs:
       id-token: write
     strategy:
       fail-fast: false
-      max-parallel: 4
+      # Nearly every extract changes daily, so this sets how long a night takes.
+      max-parallel: 8
       matrix:
         country: ${{ fromJSON(needs.plan.outputs.countries) }}
     steps:

@@ -1,11 +1,14 @@
 """The list of countries to build, read from countries.yml."""
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
 import yaml
 
 ALGORITHMS = ("ch", "mld")
+# osrm-server puts a code in URLs and S3 keys and accepts only this shape.
+CODE = re.compile(r"[a-z0-9]{2,16}")
 
 
 @dataclass(frozen=True)
@@ -22,6 +25,8 @@ def load_countries(path: Path) -> dict[str, Country]:
     countries: dict[str, Country] = {}
     for entry in raw["countries"]:
         code = entry["code"]
+        if not CODE.fullmatch(code):
+            raise ValueError(f"{code!r}: a code is 2 to 16 lowercase letters or digits")
         algorithm = entry.get("algorithm", raw["algorithm"])
         if algorithm not in ALGORITHMS:
             raise ValueError(f"{code}: unknown algorithm {algorithm!r}")

@@ -36,6 +36,16 @@ def test_countries_file_is_valid():
     assert countries["kr"].url.endswith("/asia/south-korea-latest.osm.pbf")
 
 
+@pytest.mark.parametrize("code", ["k", "us-west", "KR", "a" * 17])
+def test_a_code_osrm_server_would_reject_is_refused(tmp_path, code):
+    path = tmp_path / "countries.yml"
+    path.write_text(
+        f"source: https://example.test\nalgorithm: ch\ncountries:\n  - {{code: {code}, name: x, extract: x}}\n"
+    )
+    with pytest.raises(ValueError, match="lowercase"):
+        load_countries(path)
+
+
 @pytest.mark.parametrize(
     ("manifest", "md5", "expected"),
     [
