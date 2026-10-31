@@ -25,7 +25,7 @@ smaller.
 
 ```sh
 uv sync
-uv run python -m osrm_data build kr --workdir /tmp/osrm   # nothing leaves the machine without --bucket
+uv run python -m osrm_data build kr --workdir /tmp/osrm   # nothing leaves the machine until `publish`
 uv run pytest -m "not e2e"                                # -m e2e runs the real toolchain on Monaco
 ```
 

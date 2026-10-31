@@ -1,11 +1,14 @@
 import tarfile
 
+import boto3
 import pytest
+from moto import mock_aws
 
-from osrm_data.__main__ import COUNTRIES_FILE, is_current
+from osrm_data import __main__ as cli
+from osrm_data.__main__ import COUNTRIES_FILE, is_current, run_build, run_publish
 from osrm_data.config import Country, load_countries
-from osrm_data.pipeline import BUILD_ONLY_SUFFIXES, OSRM_VERSION, build, fetch_md5, package
-from osrm_data.store import Manifest
+from osrm_data.pipeline import BUILD_ONLY_SUFFIXES, OSRM_VERSION, Build, build, fetch_md5, package
+from osrm_data.store import Manifest, Store
 
 COUNTRY = Country(code="kr", name="South Korea", url="https://example.test/kr.osm.pbf", algorithm="ch")
 
@@ -46,6 +49,39 @@ def test_countries_file_is_valid():
 )
 def test_is_current(manifest, md5, expected):
     assert is_current(manifest, COUNTRY, md5) is expected
+
+
+@pytest.fixture
+def bucket(monkeypatch):
+    def fake_build(country, md5, workdir):
+        workdir.mkdir(parents=True)
+        archive = workdir / f"{country.code}.tar.zst"
+        archive.write_bytes(b"dataset")
+        return Build(archive=archive, dataset_bytes=7)
+
+    monkeypatch.setattr(cli, "build", fake_build)
+    monkeypatch.setattr(cli, "fetch_md5", lambda url: "abc")
+    with mock_aws():
+        boto3.client("s3", region_name="us-east-1").create_bucket(Bucket="test-bucket")
+        yield "test-bucket"
+
+
+def test_build_touches_nothing_until_publish(bucket, tmp_path):
+    assert run_build(COUNTRY, bucket, tmp_path, force=False) == "built"
+    assert Store(bucket).latest("kr") is None
+
+    assert run_publish(COUNTRY, bucket, tmp_path) == "published"
+    published = Store(bucket).latest("kr")
+    assert published is not None and published.source_md5 == "abc"
+    assert Store(bucket).s3.get_object(Bucket=bucket, Key=published.archive_key)["Body"].read() == b"dataset"
+
+
+def test_a_skipped_build_leaves_nothing_to_publish(bucket, tmp_path):
+    run_build(COUNTRY, bucket, tmp_path, force=False)
+    run_publish(COUNTRY, bucket, tmp_path)
+
+    assert run_build(COUNTRY, bucket, tmp_path, force=False) == "skipped"
+    assert run_publish(COUNTRY, bucket, tmp_path) == "skipped"
 
 
 def test_package_leaves_out_build_only_files(tmp_path):
