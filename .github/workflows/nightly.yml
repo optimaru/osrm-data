@@ -96,7 +96,7 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ap-northeast-2
 
-      - name: Build and publish
+      - name: Build
         env:
           COUNTRY: ${{ matrix.country }}
           BUCKET: ${{ vars.OSRM_DATA_BUCKET }}
@@ -106,6 +106,22 @@ jobs:
           if [ "$UPLOAD" = "true" ]; then args+=(--bucket "$BUCKET"); fi
           if [ "$FORCE" = "true" ]; then args+=(--force); fi
           uv run --no-dev python -m osrm_data "${args[@]}"
+
+      # Credentials last an hour and a large country takes longer than that to
+      # build, so the upload takes new ones.
+      - uses: aws-actions/configure-aws-credentials@v4
+        if: env.UPLOAD == 'true'
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ap-northeast-2
+          unset-current-credentials: true
+
+      - name: Publish
+        if: env.UPLOAD == 'true'
+        env:
+          COUNTRY: ${{ matrix.country }}
+          BUCKET: ${{ vars.OSRM_DATA_BUCKET }}
+        run: uv run --no-dev python -m osrm_data publish "$COUNTRY" --bucket "$BUCKET" --workdir /mnt/osrm
 
   # GitHub disables scheduled workflows after 60 days without repository activity,
   # and a healthy nightly build produces no commits.
