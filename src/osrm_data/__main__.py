@@ -42,12 +42,12 @@ def summarize(country: Country, status: str, stages: dict[str, dict[str, float]]
             file.write(text)
 
 
-def run_build(country: Country, bucket: str | None, workdir: Path, force: bool) -> None:
+def run_build(country: Country, bucket: str | None, workdir: Path, force: bool) -> str:
     store = Store(bucket) if bucket else None
     md5 = fetch_md5(country.url)
     if store and not force and is_current(store.latest(country.code), country, md5):
         summarize(country, "unchanged, skipped")
-        return
+        return "skipped"
 
     target = workdir / country.code
     shutil.rmtree(target, ignore_errors=True)
@@ -69,6 +69,7 @@ def run_build(country: Country, bucket: str | None, workdir: Path, force: bool) 
     if store:
         store.publish(result.archive, manifest)
     summarize(country, "published" if store else "built, not uploaded", result.stages)
+    return "published" if store else "built"
 
 
 def main() -> None:
