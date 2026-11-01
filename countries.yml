@@ -5,8 +5,8 @@
 #   extract    path of the extract under `source`, without `-latest.osm.pbf`
 #   algorithm  optional, overrides `algorithm` below
 #
-# Countries that need more memory than a hosted runner has belong in a separate
-# runner, see "Capacity" in the README.
+# A country too large for a hosted runner is built as regions, each with its own
+# code. A route cannot cross from one region to another, see "Capacity" in the README.
 source: https://download.geofabrik.de
 # ch answers distance matrices about five times faster than mld, and a matrix is
 # what the route optimizer asks for. mld preprocesses about ten times faster.
@@ -39,3 +39,180 @@ countries:
   - code: jp
     name: Japan
     extract: asia/japan
+  # Middle East and Central Asia.
+  - code: gcc
+    name: Gulf Cooperation Council
+    extract: asia/gcc-states
+  - code: tr
+    name: Turkey
+    extract: europe/turkey
+  - code: eg
+    name: Egypt
+    extract: africa/egypt
+  - code: uz
+    name: Uzbekistan
+    extract: asia/uzbekistan
+  - code: kz
+    name: Kazakhstan
+    extract: asia/kazakhstan
+  # Asia and Oceania.
+  - code: mn
+    name: Mongolia
+    extract: asia/mongolia
+  - code: kh
+    name: Cambodia
+    extract: asia/cambodia
+  - code: la
+    name: Laos
+    extract: asia/laos
+  - code: bd
+    name: Bangladesh
+    extract: asia/bangladesh
+  - code: nz
+    name: New Zealand
+    extract: australia-oceania/new-zealand
+  # India, too large as a whole.
+  - code: insouth
+    name: India, southern zone
+    extract: asia/india/southern-zone
+  - code: inwest
+    name: India, western zone
+    extract: asia/india/western-zone
+  - code: innorth
+    name: India, northern zone
+    extract: asia/india/northern-zone
+  - code: ineast
+    name: India, eastern zone
+    extract: asia/india/eastern-zone
+  - code: incentral
+    name: India, central zone
+    extract: asia/india/central-zone
+  # Europe.
+  - code: gb
+    name: Great Britain
+    extract: europe/great-britain
+  - code: fr
+    name: France
+    extract: europe/france
+  - code: es
+    name: Spain
+    extract: europe/spain
+  - code: nl
+    name: Netherlands
+    extract: europe/netherlands
+  - code: pl
+    name: Poland
+    extract: europe/poland
+  - code: hu
+    name: Hungary
+    extract: europe/hungary
+  - code: cz
+    name: Czech Republic
+    extract: europe/czech-republic
+  - code: sk
+    name: Slovakia
+    extract: europe/slovakia
+  - code: ro
+    name: Romania
+    extract: europe/romania
+  # Germany by state. Geofabrik publishes no checksum for the whole country.
+  - code: dehe
+    name: Germany, Hesse
+    extract: europe/germany/hessen
+  - code: denw
+    name: Germany, North Rhine-Westphalia
+    extract: europe/germany/nordrhein-westfalen
+  - code: deby
+    name: Germany, Bavaria
+    extract: europe/germany/bayern
+  - code: debw
+    name: Germany, Baden-Wuerttemberg
+    extract: europe/germany/baden-wuerttemberg
+  # Latin America.
+  - code: mx
+    name: Mexico
+    extract: north-america/mexico
+  - code: cl
+    name: Chile
+    extract: south-america/chile
+  - code: brsudeste
+    name: Brazil, Southeast
+    extract: south-america/brazil/sudeste
+  - code: brsul
+    name: Brazil, South
+    extract: south-america/brazil/sul
+  # Canada by province.
+  - code: caon
+    name: Ontario
+    extract: north-america/canada/ontario
+  - code: cabc
+    name: British Columbia
+    extract: north-america/canada/british-columbia
+  - code: caqc
+    name: Quebec
+    extract: north-america/canada/quebec
+  - code: caab
+    name: Alberta
+    extract: north-america/canada/alberta
+  # United States. The Northeast stays whole because New York spans three states. The Midwest and South run out of
+  # memory, and the West fits but exceeds osrm-server's default memory budget, so those are built by state.
+  - code: usnortheast
+    name: United States, Northeast
+    extract: north-america/us-northeast
+  - code: usca
+    name: California
+    extract: north-america/us/california
+  - code: ustx
+    name: Texas
+    extract: north-america/us/texas
+  - code: usfl
+    name: Florida
+    extract: north-america/us/florida
+  - code: usga
+    name: Georgia
+    extract: north-america/us/georgia
+  - code: usnc
+    name: North Carolina
+    extract: north-america/us/north-carolina
+  - code: ussc
+    name: South Carolina
+    extract: north-america/us/south-carolina
+  - code: ustn
+    name: Tennessee
+    extract: north-america/us/tennessee
+  - code: usal
+    name: Alabama
+    extract: north-america/us/alabama
+  - code: usky
+    name: Kentucky
+    extract: north-america/us/kentucky
+  - code: usva
+    name: Virginia
+    extract: north-america/us/virginia
+  - code: usmd
+    name: Maryland
+    extract: north-america/us/maryland
+  - code: usil
+    name: Illinois
+    extract: north-america/us/illinois
+  - code: usmi
+    name: Michigan
+    extract: north-america/us/michigan
+  - code: usoh
+    name: Ohio
+    extract: north-america/us/ohio
+  - code: usin
+    name: Indiana
+    extract: north-america/us/indiana
+  - code: uswa
+    name: Washington
+    extract: north-america/us/washington
+  - code: usaz
+    name: Arizona
+    extract: north-america/us/arizona
+  - code: usnv
+    name: Nevada
+    extract: north-america/us/nevada
+  - code: ushi
+    name: Hawaii
+    extract: north-america/us/hawaii

@@ -20,6 +20,8 @@ repos:
     rev: v2.4.2
     hooks:
       - id: codespell
+        # Country codes in countries.yml, such as usal for Alabama.
+        args: ["--ignore-words-list=usal,usin"]
         files: ^.*\.(py|md|yml)$
 
   - repo: local
