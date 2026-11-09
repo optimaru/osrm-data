@@ -4,7 +4,7 @@ Nightly per-country [OSRM](https://project-osrm.org) road network datasets for t
 built from [OpenStreetMap](https://www.openstreetmap.org) extracts.
 
 Every night a GitHub Actions job checks each country in [countries.yml](countries.yml). If its extract
-changed, or the OSRM version did, the job rebuilds the dataset and publishes it to S3. Unchanged
+changed, or the OSRM version or the country's algorithm did, the job rebuilds the dataset and publishes it to S3. Unchanged
 countries are skipped.
 
 ## Published layout
@@ -15,7 +15,8 @@ countries are skipped.
 ```
 
 Versions are UTC build timestamps. `latest.json` records the archive's key, SHA-256 and sizes, the OSRM
-version, the algorithm and the time and peak memory of each stage. A reader must use the same
+version, the algorithm, the source extract's URL and MD5, the build time and the time and peak memory of each
+stage. A reader must use the same
 `osrm-bindings` version as `osrm_version`, because the data format changes between releases.
 
 Files only the preprocessing tools read are left out of the archive, which makes it about a quarter
@@ -27,6 +28,7 @@ smaller.
 uv sync
 uv run python -m osrm_data build kr --workdir /tmp/osrm   # nothing leaves the machine until `publish`
 uv run pytest -m "not e2e"                                # -m e2e runs the real toolchain on Monaco
+uv run --group precommit pre-commit run --all-files       # what CI runs: ruff, codespell, ty and all tests
 ```
 
 ## Add a country
@@ -127,7 +129,8 @@ memory shows up. The US West built in 187 minutes, but its 8.01 GiB dataset is o
 A region is its own dataset, so **a route cannot cross its border**, and a reader has to pick the code for
 the coordinates it has. Prefer the largest region that fits, so that a metropolitan area stays in one
 dataset: that is why the US Northeast is whole. Washington D.C. is the known gap, split between Virginia
-and Maryland, with the district itself not built.
+and Maryland, with the district itself not built. Only the regions in [countries.yml](countries.yml) are
+built: most US states and India's north-eastern zone, for example, are not.
 
 Geofabrik publishes no `.md5` for the whole of Germany and sends its extract to a mirror, so Germany is built
 by state.
