@@ -15,12 +15,12 @@ countries are skipped.
 ```
 
 Versions are UTC build timestamps. `latest.json` records the archive's key, SHA-256 and sizes, the OSRM
-version, the algorithm, the source extract's URL and MD5, the build time and the time and peak memory of each
-stage. A reader must use the same
+version, the algorithm, the source extract's URL and MD5, the build time, the time and peak memory of each
+stage, and the dataset's license and attribution. A reader must use the same
 `osrm-bindings` version as `osrm_version`, because the data format changes between releases.
 
 Files only the preprocessing tools read are left out of the archive, which makes it about a quarter
-smaller.
+smaller. Every archive also holds a `NOTICE.txt` with the dataset's license, attribution and source extract.
 
 ## Build locally
 
@@ -137,7 +137,17 @@ by state.
 
 ## License
 
-The code is under the [Apache License 2.0](LICENSE). The datasets are derived from OpenStreetMap
-data, © OpenStreetMap contributors, available under the
-[Open Database License](https://www.openstreetmap.org/copyright). Anyone using them must give that
-attribution.
+The code in this repository is under the [Apache License 2.0](LICENSE). That license does not cover the
+datasets.
+
+The datasets are databases derived from [OpenStreetMap](https://www.openstreetmap.org/copyright) data,
+© OpenStreetMap contributors, and are made available under the
+[Open Database License (ODbL) 1.0](https://opendatacommons.org/licenses/odbl/1-0/). Anyone who uses them, or
+shows routes, distances or anything else produced from them, must give that attribution, and a database
+derived from them stays under the ODbL. Each `latest.json` and each archive's `NOTICE.txt` carries the license
+and attribution.
+
+The extracts come from [Geofabrik](https://download.geofabrik.de)'s download server. A dataset is rebuilt from
+its extract with the unmodified car profile that ships with `osrm-bindings`, so the manifest's `source_url`,
+`source_md5`, `osrm_version` and `algorithm` together with this repository are enough to reproduce it.
+[OSRM](https://github.com/Project-OSRM/osrm-backend) and its profiles are under the BSD 2-Clause License.

@@ -19,6 +19,8 @@ import boto3
 from boto3.s3.transfer import TransferConfig
 from botocore.exceptions import ClientError
 
+from osrm_data.config import DATA_ATTRIBUTION, DATA_LICENSE
+
 KEEP_VERSIONS = 3
 
 # Larger parts than the 8 MiB default: a dataset takes far fewer requests.
@@ -39,6 +41,9 @@ class Manifest:
     source_md5: str
     built_at: str
     stages: dict[str, dict[str, float]]
+    # The dataset's own terms. Defaults, so a manifest published before these existed still loads.
+    license: str = DATA_LICENSE
+    attribution: str = DATA_ATTRIBUTION
 
 
 def _sha256(path: Path) -> str:
