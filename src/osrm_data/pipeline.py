@@ -1,6 +1,7 @@
 """Turns one OpenStreetMap extract into a packaged OSRM dataset."""
 
 import hashlib
+import io
 import os
 import resource
 import subprocess
@@ -15,7 +16,7 @@ from pathlib import Path
 
 import osrm
 
-from osrm_data.config import Country
+from osrm_data.config import DATA_ATTRIBUTION, DATA_LICENSE, DATA_LICENSE_URL, Country
 
 OSRM_VERSION = metadata.version("osrm-bindings")
 PROFILE = Path(osrm.__file__).parent / "share" / "profiles" / "car.lua"
@@ -23,6 +24,23 @@ PROFILE = Path(osrm.__file__).parent / "share" / "profiles" / "car.lua"
 # Written by the preprocessing tools but never read when serving. Leaving them out
 # makes a dataset about a quarter smaller.
 BUILD_ONLY_SUFFIXES = frozenset({".ebg", ".cnbg", ".cnbg_to_ebg", ".enw", ".turn_penalties_index"})
+
+# Travels inside every archive, so a copy of the dataset keeps its license and credit.
+NOTICE_FILE = "NOTICE.txt"
+
+
+def notice(country: Country, md5: str) -> str:
+    return (
+        f"OSRM road network dataset for {country.name}, car profile.\n"
+        "\n"
+        f"Derived from OpenStreetMap data, {DATA_ATTRIBUTION}\n"
+        "(https://www.openstreetmap.org/copyright), and made available under the\n"
+        f"Open Database License ({DATA_LICENSE}): {DATA_LICENSE_URL}\n"
+        "Any use must keep this notice and give that attribution.\n"
+        "\n"
+        f"Source extract: {country.url} (MD5 {md5})\n"
+        f"Built with OSRM {OSRM_VERSION} ({country.algorithm}) by https://github.com/optimaru/osrm-data\n"
+    )
 
 
 @dataclass
@@ -80,8 +98,8 @@ def build_dataset(country: Country, pbf: Path, threads: int) -> tuple[Path, dict
     return base, stages
 
 
-def package(base: Path, archive: Path, threads: int) -> int:
-    """Packs the files needed for serving and returns their uncompressed size."""
+def package(base: Path, archive: Path, threads: int, notice_text: str) -> int:
+    """Packs the files needed for serving, with the notice, and returns the dataset's uncompressed size."""
     size = 0
     options: dict[int, int] = {
         zstd.CompressionParameter.compression_level: 3,
@@ -93,6 +111,11 @@ def package(base: Path, archive: Path, threads: int) -> int:
                 continue
             size += path.stat().st_size
             tar.add(path, arcname=path.name)
+        body = notice_text.encode()
+        info = tarfile.TarInfo(NOTICE_FILE)
+        info.size = len(body)
+        info.mtime = int(time.time())
+        tar.addfile(info, io.BytesIO(body))
     return size
 
 
@@ -103,4 +126,5 @@ def build(country: Country, md5: str, workdir: Path) -> Build:
     download(country.url, pbf, md5)
     base, stages = build_dataset(country, pbf, threads)
     archive = workdir / f"{country.code}.tar.zst"
-    return Build(archive=archive, dataset_bytes=package(base, archive, threads), stages=stages)
+    size = package(base, archive, threads, notice(country, md5))
+    return Build(archive=archive, dataset_bytes=size, stages=stages)

@@ -10,6 +10,13 @@ ALGORITHMS = ("ch", "mld")
 # osrm-server puts a code in URLs and S3 keys and accepts only this shape.
 CODE = re.compile(r"[a-z0-9]{2,16}")
 
+# A dataset is a database derived from OpenStreetMap, so it carries OpenStreetMap's
+# license, not the Apache one this repository's code is under. Every manifest and
+# archive says so.
+DATA_LICENSE = "ODbL-1.0"
+DATA_LICENSE_URL = "https://opendatacommons.org/licenses/odbl/1-0/"
+DATA_ATTRIBUTION = "© OpenStreetMap contributors"
+
 
 @dataclass(frozen=True)
 class Country:

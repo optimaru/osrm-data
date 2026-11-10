@@ -7,7 +7,7 @@ from moto import mock_aws
 from osrm_data import __main__ as cli
 from osrm_data.__main__ import COUNTRIES_FILE, is_current, run_build, run_publish
 from osrm_data.config import Country, load_countries
-from osrm_data.pipeline import BUILD_ONLY_SUFFIXES, OSRM_VERSION, Build, build, fetch_md5, package
+from osrm_data.pipeline import BUILD_ONLY_SUFFIXES, NOTICE_FILE, OSRM_VERSION, Build, build, fetch_md5, notice, package
 from osrm_data.store import Manifest, Store
 
 COUNTRY = Country(code="kr", name="South Korea", url="https://example.test/kr.osm.pbf", algorithm="ch")
@@ -102,9 +102,30 @@ def test_package_leaves_out_build_only_files(tmp_path):
     (tmp_path / "kr.osrm2.hsgr").write_bytes(b"other")
     archive = tmp_path / "out.tar.zst"
 
-    assert package(base, archive, threads=1) == 5
+    assert package(base, archive, threads=1, notice_text=notice(COUNTRY, "abc")) == 5
     with tarfile.open(archive) as tar:
-        assert tar.getnames() == ["kr.osrm.hsgr"]
+        assert tar.getnames() == ["kr.osrm.hsgr", NOTICE_FILE]
+
+
+def test_an_archive_carries_the_data_license_and_credit(tmp_path):
+    """The datasets are OpenStreetMap's data under ODbL, not Apache like this repository's code."""
+    base = tmp_path / "kr.osrm"
+    base.with_name("kr.osrm.hsgr").write_bytes(b"12345")
+    archive = tmp_path / "out.tar.zst"
+
+    package(base, archive, threads=1, notice_text=notice(COUNTRY, "abc"))
+    with tarfile.open(archive) as tar:
+        member = tar.extractfile(NOTICE_FILE)
+        assert member is not None
+        text = member.read().decode()
+
+    assert "© OpenStreetMap contributors" in text
+    assert "https://opendatacommons.org/licenses/odbl/1-0/" in text
+    assert COUNTRY.url in text
+
+
+def test_a_manifest_names_the_data_license():
+    assert (_manifest().license, _manifest().attribution) == ("ODbL-1.0", "© OpenStreetMap contributors")
 
 
 @pytest.mark.e2e
