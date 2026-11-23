@@ -16,7 +16,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from osrm_data.config import Country, load_countries
-from osrm_data.pipeline import OSRM_VERSION, build, fetch_md5
+from osrm_data.pipeline import OSRM_VERSION, build, resolve
 from osrm_data.store import Manifest, Store, manifest_for
 
 COUNTRIES_FILE = Path(__file__).parents[2] / "countries.yml"
@@ -47,12 +47,12 @@ def summarize(country: Country, status: str, stages: dict[str, dict[str, float]]
 def run_build(country: Country, bucket: str | None, workdir: Path, force: bool) -> str:
     target = workdir / country.code
     shutil.rmtree(target, ignore_errors=True)
-    md5 = fetch_md5(country.url)
-    if bucket and not force and is_current(Store(bucket).latest(country.code), country, md5):
+    extract = resolve(country.url)
+    if bucket and not force and is_current(Store(bucket).latest(country.code), country, extract.md5):
         summarize(country, "unchanged, skipped")
         return "skipped"
 
-    result = build(country, md5, target)
+    result = build(country, extract, target)
     now = datetime.now(UTC)
     manifest = manifest_for(
         code=country.code,
@@ -61,8 +61,8 @@ def run_build(country: Country, bucket: str | None, workdir: Path, force: bool) 
         osrm_version=OSRM_VERSION,
         archive=result.archive,
         dataset_bytes=result.dataset_bytes,
-        source_url=country.url,
-        source_md5=md5,
+        source_url=extract.url,
+        source_md5=extract.md5,
         built_at=now.isoformat(),
         stages=result.stages,
     )
