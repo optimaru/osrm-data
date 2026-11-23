@@ -11,8 +11,11 @@ name: nightly build
 
 on:
   schedule:
-    # 03:00 in Korea. The extracts are refreshed late in the UTC evening.
-    - cron: "0 18 * * *"
+    # 03:17 in Korea. Off the hour, because GitHub delays scheduled runs at the top of
+    # the hour by hours and sometimes drops them. Geofabrik publishes the day's
+    # extracts around midnight UTC; a run that overlaps that is safe, since each build
+    # pins one dated file and its checksum.
+    - cron: "17 18 * * *"
   workflow_dispatch:
     inputs:
       countries:

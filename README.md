@@ -7,6 +7,10 @@ Every night a GitHub Actions job checks each country in [countries.yml](countrie
 changed, or the OSRM version or the country's algorithm did, the job rebuilds the dataset and publishes it to S3. Unchanged
 countries are skipped.
 
+Geofabrik's `-latest` link redirects to a dated file (`south-korea-261122.osm.pbf`). The job follows it once
+and reads that file's own `.md5`, so the checksum and the download always describe the same extract, even
+while a new one is being published. A failed request is retried four times, 30 seconds to 4 minutes apart.
+
 ## Published layout
 
 ```
@@ -15,7 +19,7 @@ countries are skipped.
 ```
 
 Versions are UTC build timestamps. `latest.json` records the archive's key, SHA-256 and sizes, the OSRM
-version, the algorithm, the source extract's URL and MD5, the build time, the time and peak memory of each
+version, the algorithm, the dated source extract's URL and MD5, the build time, the time and peak memory of each
 stage, and the dataset's license and attribution. A reader must use the same
 `osrm-bindings` version as `osrm_version`, because the data format changes between releases.
 
