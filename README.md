@@ -116,6 +116,10 @@ with OSRM 26.10.0 and the `ch` algorithm in October 2026:
 | United States, Northeast | 1724 MiB | 5.3 GiB | 2.4 GiB | 14.7 GiB | 91 min |
 | Mexico | 617 MiB | 5.0 GiB | 2.2 GiB | 14.7 GiB | 114 min |
 | Japan | 2446 MiB | 7.6 GiB | 3.4 GiB | 14.9 GiB | 258 min |
+| Italy, Centre (`itcentro`) | — | — | — | — | — |
+
+The October measurements predate the addition of central Italy. The `itcentro` dataset covers
+Tuscany, Umbria, Marche and Lazio, including Florence, where the web routing demos are set.
 
 `extract` sets the peak. It tracks the road network rather than the extract size: Vietnam needs more
 than Australia from a third of the file size. Check a new country with a test run instead of guessing.
