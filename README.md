@@ -3,9 +3,8 @@
 Nightly per-country [OSRM](https://project-osrm.org) road network datasets for the car profile,
 built from [OpenStreetMap](https://www.openstreetmap.org) extracts.
 
-Every night a GitHub Actions job checks each country in [countries.yml](countries.yml). If its extract
-changed, or the OSRM version or the country's algorithm did, the job rebuilds the dataset and publishes it to S3. Unchanged
-countries are skipped.
+A nightly workflow checks every entry in [countries.yml](countries.yml). It rebuilds and publishes a
+dataset to S3 when the source extract, OSRM version or configured algorithm changes.
 
 Geofabrik's `-latest` link redirects to a dated file (`south-korea-261122.osm.pbf`). The job follows it once
 and reads that file's own `.md5`, so the checksum and the download always describe the same extract, even
@@ -23,8 +22,7 @@ version, the algorithm, the dated source extract's URL and MD5, the build time, 
 stage, and the dataset's license and attribution. A reader must use the same
 `osrm-bindings` version as `osrm_version`, because the data format changes between releases.
 
-Files only the preprocessing tools read are left out of the archive, which makes it about a quarter
-smaller. Every archive also holds a `NOTICE.txt` with the dataset's license, attribution and source extract.
+Omitting files used only during preprocessing reduces the archive size by about a quarter. Every archive also holds a `NOTICE.txt` with the dataset's license, attribution and source extract.
 
 ## Build locally
 
