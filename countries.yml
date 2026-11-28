@@ -115,6 +115,11 @@ countries:
   - code: ro
     name: Romania
     extract: europe/romania
+  # Italy's centre (Tuscany, Umbria, Marche, Lazio) holds Florence, where the routing demos of optimaru/web
+  # are set. The whole country is not built yet.
+  - code: itcentro
+    name: Italy, Centre
+    extract: europe/italy/centro
   # Germany by state. Geofabrik publishes no checksum for the whole country.
   - code: dehe
     name: Germany, Hesse
