@@ -1,20 +1,20 @@
 # osrm-data
 
-Nightly per-country [OSRM](https://project-osrm.org) road network datasets for the car profile,
-built from [OpenStreetMap](https://www.openstreetmap.org) extracts.
+Per-country [OSRM](https://project-osrm.org) road network datasets for car routing,
+built nightly from [OpenStreetMap](https://www.openstreetmap.org) extracts.
 
 A nightly workflow checks every entry in [countries.yml](countries.yml). It rebuilds and publishes a
 dataset to S3 when the source extract, OSRM version or configured algorithm changes.
 
 Geofabrik's `-latest` link redirects to a dated file (`south-korea-261122.osm.pbf`). The job follows it once
-and reads that file's own `.md5`, so the checksum and the download always describe the same extract, even
+and reads the matching `.md5` file so it can verify the download against the checksum for that version, even
 while a new one is being published. A failed request is retried four times, 30 seconds to 4 minutes apart.
 
 ## Published layout
 
 ```
 <code>/latest.json                 manifest, written last
-<code>/<version>/<code>.tar.zst    immutable dataset, the last three are kept
+<code>/<version>/<code>.tar.zst    immutable dataset (the three most recent versions are retained)
 ```
 
 Versions are UTC build timestamps. `latest.json` records the archive's key, SHA-256 and sizes, the OSRM
@@ -22,7 +22,7 @@ version, the algorithm, the dated source extract's URL and MD5, the build time, 
 stage, and the dataset's license and attribution. A reader must use the same
 `osrm-bindings` version as `osrm_version`, because the data format changes between releases.
 
-Omitting files used only during preprocessing reduces the archive size by about a quarter. Every archive also holds a `NOTICE.txt` with the dataset's license, attribution and source extract.
+Omitting files used only during preprocessing reduces the archive size by about a quarter. Every archive also contains a `NOTICE.txt` with the dataset's license, attribution and source extract.
 
 ## Build locally
 
@@ -36,10 +36,10 @@ uv run --group precommit pre-commit run --all-files       # what CI runs: ruff, 
 ## Add a country
 
 Add an entry to [countries.yml](countries.yml), then start the `nightly build` workflow by hand with
-that code and `upload` turned off to see whether it fits. The job summary shows the time and peak
+the new code and `upload` disabled to check whether the build fits within the runner’s resource limits. The job summary shows the time and peak
 memory of each stage.
 
-A code is 2 to 16 lowercase letters or digits, because osrm-server accepts only that. Use the ISO country
+Use a code of 2 to 16 lowercase letters or digits, as required by osrm-server. Use the ISO country
 code, then the subdivision for a region (`usca`, `deby`), or a word where the subdivision has no code
 (`usnortheast`, `insouth`). The dataset also has to be smaller than the memory budget of the osrm-server
 that serves it.
@@ -121,12 +121,12 @@ with OSRM 26.10.0 and the `ch` algorithm in October 2026:
 The October measurements predate the addition of central Italy. The `itcentro` dataset covers
 Tuscany, Umbria, Marche and Lazio, including Florence, where the web routing demos are set.
 
-`extract` sets the peak. It tracks the road network rather than the extract size: Vietnam needs more
-than Australia from a third of the file size. Check a new country with a test run instead of guessing.
+`extract` uses the most memory. Usage depends on the road network: Vietnam needs more
+memory than Australia even though its extract is about a third of the size. Run a test build to measure memory usage for each new country.
 Indonesia, Japan, France, Great Britain, Mexico and the US Northeast are at the limit of what these
 runners can hold: all reach about 15 GiB in `extract`, and Japan's `contract` takes over two and a half
-hours, which leaves about 90 minutes of the job's 350 minute timeout. If one of them outgrows the runner
-its job fails and readers keep the last version.
+hours, which leaves about 90 minutes of the job's 350 minute timeout. If a build exceeds the runner’s limits,
+it fails and readers continue using the most recent published version.
 
 The whole of India and Brazil and the US Midwest and South lost their runner, which is how running out of
 memory shows up. The US West built in 187 minutes, but its 8.01 GiB dataset is over osrm-server's default
